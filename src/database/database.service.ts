@@ -9,6 +9,17 @@ export class DatabaseService implements OnModuleInit {
   private pool: Pool;
 
   constructor() {
+  if (process.env.DATABASE_URL) {
+    // ✅ Railway / Production
+    this.pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    });
+    console.log('🌐 Using Railway DATABASE_URL');
+  } else {
+    // ✅ Local development
     const { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } = process.env;
 
     if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
@@ -16,21 +27,18 @@ export class DatabaseService implements OnModuleInit {
     }
 
     const port = parseInt(DB_PORT, 10);
-    if (isNaN(port)) {
-      throw new Error('DB_PORT must be a valid number');
-    }
 
-    const config: PoolConfig = {
+    this.pool = new Pool({
       user: DB_USER,
       host: DB_HOST,
       database: DB_NAME,
       password: DB_PASSWORD,
       port,
-    };
+    });
 
-    this.pool = new Pool(config);
+    console.log('💻 Using local DB config');
   }
-
+}
   async query(text: string, params?: any[]) {
     return this.pool.query(text, params);
   }
