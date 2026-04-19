@@ -5,6 +5,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard, Roles } from '../auth/roles.guard';
 
+import { Patch } from '@nestjs/common';
+
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
@@ -51,4 +53,12 @@ export class ProductsController {
   reduceStock(@Body() reduceStockDto: any) {
     return this.productsService.reduceStock(reduceStockDto);
   }
+
+  @Patch(':id')
+async updateProduct(
+  @Param('id') id: string,
+  @Body() body: any,
+) {
+  return this.productsService.updateProduct(+id, body);
+}
 }

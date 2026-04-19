@@ -89,4 +89,19 @@ export class ProductsService {
     }
     return { message: 'Stock updated successfully' };
   }
+
+  async updateProduct(id: number, body: any) {
+  const result = await this.db.query(
+    `UPDATE products
+     SET name = COALESCE($1, name),
+         price = COALESCE($2, price),
+         stock = COALESCE($3, stock),
+         category = COALESCE($4, category)
+     WHERE id = $5
+     RETURNING *`,
+    [body.name, body.price, body.stock, body.category, id],
+  );
+
+  return result.rows[0];
+}
 }
