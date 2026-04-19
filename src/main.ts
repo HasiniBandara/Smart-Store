@@ -13,6 +13,7 @@ async function bootstrap() {
   app.enableCors({
   origin: [
     'http://localhost:5173',
+    'http://localhost:5174',
     'https://smart-store-frontend.vercel.app',
     'https://c-and-c-smart-store-admin-web.vercel.app',
   ],
