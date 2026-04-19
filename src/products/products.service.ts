@@ -96,10 +96,16 @@ export class ProductsService {
      SET name = COALESCE($1, name),
          price = COALESCE($2, price),
          stock = COALESCE($3, stock),
-         category = COALESCE($4, category)
+         category_id = COALESCE($4, category_id)
      WHERE id = $5
      RETURNING *`,
-    [body.name, body.price, body.stock, body.category, id],
+    [
+      body.name,
+      body.price,
+      body.stock,
+      body.category_id,
+      id,
+    ],
   );
 
   return result.rows[0];

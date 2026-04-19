@@ -55,6 +55,8 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles('admin')
 async updateProduct(
   @Param('id') id: string,
   @Body() body: any,
