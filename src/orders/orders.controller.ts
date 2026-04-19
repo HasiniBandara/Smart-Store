@@ -45,7 +45,6 @@ export class OrdersController {
   }
 
   @Get()
-@UseGuards(AuthGuard)
 async findAll() {
   return this.ordersService.findAll();
 }
