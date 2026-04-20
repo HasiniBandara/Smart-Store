@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
         process.env.JWT_SECRET || 'supersecret',
       ) as any;
       
-      // Inject user info into request for controllers to use
+      // Use user info into request for controllers to use
       request.user = {
         id: decoded.id,
         email: decoded.email,

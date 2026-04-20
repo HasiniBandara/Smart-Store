@@ -14,13 +14,13 @@ export class OrdersService {
 
   async createOrder(
     userId: number,
-    totalPrice: number, // Still accepted but will be validated
+    totalPrice: number, 
     status: string,
     cartItems: { productId: number; quantity: number; price: number }[],
     transactionId?: string,
     paymentGateway?: 'stripe' | 'paypal',
   ) {
-    // 1. Recalculate total price from database (Source of Truth)
+    // Recalculate total price from database
     const productIds = cartItems.map(i => i.productId);
     const dbProducts = await this.productsService.findByIds(productIds);
     
@@ -31,11 +31,11 @@ export class OrdersService {
         throw new BadRequestException(`Product with ID ${item.productId} not found`);
       }
       actualTotalPrice += Number(dbProduct.price) * item.quantity;
-      // Also update the item price in our list to the correct DB price
+      // update the item price in the list to the correct DB price
       item.price = Number(dbProduct.price);
     }
 
-    // 2. Verify Payment Amount if transactionId exists
+    // verify Payment Amount if transactionId exists
     if (transactionId) {
       if (paymentGateway === 'stripe') {
         const isValid = await this.paymentService.verifyStripePayment(transactionId, actualTotalPrice);
@@ -56,13 +56,13 @@ export class OrdersService {
     try {
       await client.query('BEGIN');
 
-      // 3. Reduce Stock (Transaction-safe)
+      // Reduce Stock 
       await this.productsService.reduceStock(
         { items: cartItems.map(i => ({ id: i.productId, quantity: i.quantity })) },
         client
       );
 
-      // 4. Insert into orders using actual price
+      // Insert into orders using actual price
       const orderInsertResult = await client.query(
         'INSERT INTO orders (user_id, total_price, status, transaction_id, payment_gateway) VALUES ($1, $2, $3, $4, $5) RETURNING id',
         [userId, actualTotalPrice, status, transactionId || null, paymentGateway || null],
@@ -70,7 +70,7 @@ export class OrdersService {
 
       const orderId = orderInsertResult.rows[0].id;
 
-      // 5. Insert into order_items
+      // Insert into order_items
       for (const item of cartItems) {
         await client.query(
           'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1, $2, $3, $4)',

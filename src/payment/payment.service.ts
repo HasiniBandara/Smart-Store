@@ -8,7 +8,7 @@ export class PaymentService {
     apiVersion: '2026-03-25.dahlia',
   });
 
-  // Shared: LKR → USD conversion
+  // LKR → USD conversion
   private async convertLKRtoUSD(lkrAmount: number): Promise<number> {
     try {
       const res = await fetch('https://open.er-api.com/v6/latest/LKR');
@@ -48,21 +48,20 @@ export class PaymentService {
       
       if (intent.status !== 'succeeded') return false;
 
-      // 1. Verify currency (must be USD as per our design)
+      // Verify currency in USD 
       if (intent.currency !== 'usd') return false;
 
-      // 2. Use the LKR amount stored in metadata during intent creation
+      // Use the LKR amount stored in during intent creation
       const metadataLkr = intent.metadata?.original_amount_lkr;
       if (metadataLkr) {
         if (parseFloat(metadataLkr) !== expectedLkrAmount) {
           console.error(`Stripe metadata amount mismatch: expected ${expectedLkrAmount}, got ${metadataLkr}`);
           return false;
         }
-        // If metadata matches, we trust the intent was created for this amount
         return true;
       }
 
-      // Fallback: Recalculate (less reliable due to rate fluctuations)
+      // Recalculate (less reliable due to rate )
       const expectedUsd = await this.convertLKRtoUSD(expectedLkrAmount);
       const expectedCents = Math.max(Math.round(expectedUsd * 100), 50);
 

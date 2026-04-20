@@ -10,16 +10,16 @@ export class DatabaseService implements OnModuleInit {
 
   constructor() {
   if (process.env.DATABASE_URL) {
-    // ✅ Railway / Production
+    // Railway 
     this.pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: {
         rejectUnauthorized: false,
       },
     });
-    console.log('🌐 Using Railway DATABASE_URL');
+    console.log('Using Railway DATABASE_URL');
   } else {
-    // ✅ Local development
+    // Local development
     const { DB_USER, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT } = process.env;
 
     if (!DB_USER || !DB_HOST || !DB_NAME || !DB_PASSWORD || !DB_PORT) {
